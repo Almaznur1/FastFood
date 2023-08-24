@@ -3,6 +3,7 @@ from django.templatetags.static import static
 from json import loads
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 
 
 from .models import Product, Order, OrderItem
@@ -64,6 +65,17 @@ def product_list_api(request):
 def register_order(request):
     order = request.data
     print(order)
+    try:
+        products = order['products']
+    except KeyError:
+        raise APIException(detail='products key not presented')
+    if order['products'] is None:
+        raise APIException(detail='the products field cannot be empty')
+    if not isinstance(products, list):
+        raise APIException(detail='products key is not a list')
+    if not order['products']:
+        raise APIException(detail='the products list cannot be empty')
+
     new_order = Order.objects.create(
         first_name=order['firstname'],
         last_name=order['lastname'],
@@ -71,7 +83,6 @@ def register_order(request):
         address=order['address'],
     )
 
-    products = order['products']
     for product in products:
         requested_product = Product.objects.get(pk=product['product'])
         OrderItem.objects.create(
