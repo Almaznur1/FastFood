@@ -4,7 +4,8 @@ from json import loads
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
-
+from rest_framework import status
+import phonenumbers
 
 from .models import Product, Order, OrderItem
 
@@ -65,16 +66,69 @@ def product_list_api(request):
 def register_order(request):
     order = request.data
     print(order)
+
     try:
         products = order['products']
     except KeyError:
         raise APIException(detail='products key not presented')
-    if order['products'] is None:
+    if products is None:
         raise APIException(detail='the products field cannot be empty')
     if not isinstance(products, list):
-        raise APIException(detail='products key is not a list')
-    if not order['products']:
+        raise APIException(detail='products key must be a list')
+    if not products:
         raise APIException(detail='the products list cannot be empty')
+    products_id = Product.objects.all().values_list('id', flat=True)
+
+    for product in products:
+        if product['product'] not in products_id:
+            return Response(f'invalid product primary key "{product["product"]}"', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # raise APIException(
+            #     detail=f'invalid product primary key "{product["product"]}"'
+            #     )
+    try:
+        order['firstname']
+        order['lastname']
+        order['address']
+    except KeyError:
+        raise APIException(detail='one or more order keys are not present')
+
+    try:
+        order['phonenumber']
+    except KeyError:
+        raise APIException(detail='the phone number is not present')
+
+    if (order['firstname'] or order['lastname'] or
+            order['address'] or order['phonenumber']) is None:
+        raise APIException(
+            detail='the value of one or more order keys is None'
+            )
+
+    try:
+        parsed_phonenumber = phonenumbers.parse(
+            order['phonenumber'],
+            'RU'
+        )
+    except phonenumbers.NumberParseException:
+        raise APIException(
+            detail='incorrect value entered in the "phonenumber" key'
+            )
+
+    if phonenumbers.is_valid_number(parsed_phonenumber):
+        order['phonenumber'] = phonenumbers.format_number(
+            parsed_phonenumber,
+            phonenumbers.PhoneNumberFormat.E164
+        )
+    else:
+        raise APIException(
+            detail='incorrect number entered in the "phonenumber" key'
+            )
+
+    if isinstance(order['firstname'], list):
+        raise APIException(detail='the key "firstname" must be str not list')
+    if not isinstance(order['firstname'], str):
+        raise APIException(detail='the key "firstname" must be str')
+    if not order['firstname']:
+        raise APIException(detail='the key "firstname" is not specified')
 
     new_order = Order.objects.create(
         first_name=order['firstname'],
