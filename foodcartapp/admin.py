@@ -18,7 +18,7 @@ class RestaurantMenuItemInline(admin.TabularInline):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    list_display = ['product', 'quantity']
+    list_display = ['product', 'quantity', 'price']
 
 
 @admin.register(Restaurant)
@@ -116,3 +116,4 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline, ]
+    list_display = ['firstname', 'lastname', 'address', 'phonenumber']
