@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, ListField
@@ -84,22 +85,24 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    new_order = Order.objects.create(
-        firstname=serializer.validated_data['firstname'],
-        lastname=serializer.validated_data['lastname'],
-        phonenumber=serializer.validated_data['phonenumber'],
-        address=serializer.validated_data['address'],
-    )
-
     products = request.data['products']
 
-    for product in products:
-        requested_product = Product.objects.get(pk=product['product'])
-        OrderItem.objects.create(
-            product=requested_product,
-            quantity=product['quantity'],
-            order=new_order,
-            price=(product['quantity'] * requested_product.price)
+    with transaction.atomic():
+        new_order = Order.objects.create(
+            firstname=serializer.validated_data['firstname'],
+            lastname=serializer.validated_data['lastname'],
+            phonenumber=serializer.validated_data['phonenumber'],
+            address=serializer.validated_data['address'],
         )
+
+        for product in products:
+            requested_product = Product.objects.get(pk=product['product'])
+            OrderItem.objects.create(
+                product=requested_product,
+                quantity=product['quantity'],
+                order=new_order,
+                price=(product['quantity'] * requested_product.price)
+            )
+
     serializer = OrderSerializer(new_order)
     return Response(serializer.data)
