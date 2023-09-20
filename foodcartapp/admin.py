@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.http import HttpResponseRedirect, HttpRequest
 
 from .models import Product
 from .models import ProductCategory
@@ -109,7 +111,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProductCategory)
-class ProductAdmin(admin.ModelAdmin):
+class ProductCategoryAdmin(admin.ModelAdmin):
     pass
 
 
@@ -117,3 +119,16 @@ class ProductAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline, ]
     list_display = ['firstname', 'lastname', 'address', 'phonenumber']
+
+    def response_change(self, request, obj):
+        res = super(OrderAdmin, self).response_post_save_change(request, obj)
+        if (
+            'next' in request.GET
+            and url_has_allowed_host_and_scheme(
+                request.path,
+                HttpRequest.get_host(request)
+            )
+        ):
+            return HttpResponseRedirect(request.GET['next'])
+        else:
+            return res
