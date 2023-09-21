@@ -118,7 +118,9 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline, ]
-    list_display = ['firstname', 'lastname', 'address', 'phonenumber']
+    list_display = [
+        'firstname', 'lastname',  'status', 'address', 'phonenumber'
+    ]
 
     def response_change(self, request, obj):
         res = super(OrderAdmin, self).response_post_save_change(request, obj)
