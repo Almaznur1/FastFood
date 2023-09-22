@@ -147,6 +147,14 @@ class Order(models.Model):
         (COMPLETED, 'Выполнен'),
     )
 
+    CASH = 'CASH'
+    NON_CASH = 'NON_CASH'
+
+    PAYMENT_METHOD_CHOICES = (
+        (CASH, 'Наличный'),
+        (NON_CASH, 'Безналичный'),
+    )
+
     firstname = models.CharField(
         'имя',
         max_length=25
@@ -175,7 +183,8 @@ class Order(models.Model):
     )
     registered_at = models.DateTimeField(
         'время создания заказа',
-        default=timezone.now
+        default=timezone.now,
+        db_index=True
     )
     called_at = models.DateTimeField(
         'время звонка клиенту',
@@ -186,6 +195,12 @@ class Order(models.Model):
         'время доставки',
         null=True,
         blank=True
+    )
+    payment_method = models.CharField(
+        'способ оплаты',
+        max_length=15,
+        choices=PAYMENT_METHOD_CHOICES,
+        db_index=True
     )
 
     objects = OrderQuerySet.as_manager()
