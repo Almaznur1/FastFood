@@ -123,11 +123,11 @@ class RestaurantMenuItem(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.restaurant.name} - {self.product.name}"
+        return f"{self.restaurant.name} - {self.product.name} {self.availability}"
 
 
 class OrderQuerySet(models.QuerySet):
-    def total_price(self):
+    def fetch_with_total_price(self):
         order = self.annotate(
             total_price=Sum(F('items__quantity') * F('items__product__price'))
         )
@@ -201,6 +201,17 @@ class Order(models.Model):
         max_length=15,
         choices=PAYMENT_METHOD_CHOICES,
         db_index=True
+    )
+    cooking_restaurant = models.ForeignKey(
+        Restaurant,
+        verbose_name='готовится в ресторане',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='orders'
+    )
+    available_restaurants = models.CharField(
+       'доступные рестораны',
+        max_length=200,
     )
 
     objects = OrderQuerySet.as_manager()
