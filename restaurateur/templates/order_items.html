@@ -1,5 +1,7 @@
 {% extends 'base_restaurateur_page.html' %}
 
+{% load restaurateur_tags %}
+
 {% block title %}Необработанные заказы | Star Burger{% endblock %}
 
 {% block content %}
@@ -44,13 +46,15 @@
             <details>
               <summary>Может быть приготовлен ресторанами:</summary>
               {% for restaurant in order.available_restaurants %}
-              {{ restaurant }}<br>
+                {{ restaurants|get_object_by_id:restaurant }} -
+                {% fetch_distance order restaurants|get_object_by_id:restaurant as distance %}
+                {{ distance|floatformat:3}} км<br>
               {% endfor %}
             </delails>
           </td>
         {% endif %}
         <td>{{order.comment}}</td>
-        <td><a href="{% url 'admin:foodcartapp_order_change' object_id=order.id %}?next={{ '/manager/orders/'|urlencode }}">Редактировать</a></td>
+        <td><a href="{% url 'admin:foodcartapp_order_change' object_id=order.id %}?next={{ '/manager/orders/'|urlencode }}">Ред.</a></td>
       </tr>
     {% endfor %}
    </table>

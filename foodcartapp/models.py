@@ -15,6 +15,8 @@ class Restaurant(models.Model):
         max_length=100,
         blank=True,
     )
+    lat = models.FloatField('Широта')
+    lon = models.FloatField('Долгота')
     contact_phone = models.CharField(
         'контактный телефон',
         max_length=50,
@@ -170,6 +172,8 @@ class Order(models.Model):
         'адрес',
         max_length=200
     )
+    lat = models.FloatField('Широта')
+    lon = models.FloatField('Долгота')
     status = models.CharField(
         'статус заказа',
         max_length=10,
@@ -210,7 +214,7 @@ class Order(models.Model):
         related_name='orders'
     )
     available_restaurants = models.CharField(
-       'доступные рестораны',
+        'доступные рестораны',
         max_length=200,
     )
 

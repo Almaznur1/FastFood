@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-
 from foodcartapp.models import Product, Restaurant, Order
 
 
@@ -93,18 +92,21 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.exclude(status='COMPLETED').fetch_with_total_price()
+    restaurants = Restaurant.objects.all()
+
     products = Product.objects.all()
     products_with_available_restaurants = {}
 
     for product in products:
-        products_with_available_restaurants[product.name] = set(
-            product.menu_items.values_list('restaurant__name', flat=True)
+        products_with_available_restaurants[product.id] = set(
+            product.menu_items.values_list('restaurant', flat=True)
         )
 
     for order in orders:
         order_products = list(
-            order.items.values_list('product__name', flat=True)
+            order.items.values_list('product', flat=True)
         )
+
         available_restaurants = products_with_available_restaurants[
             order_products[0]
         ]
@@ -119,4 +121,5 @@ def view_orders(request):
 
     return render(request, template_name='order_items.html', context={
         'orders': orders,
+        'restaurants': restaurants,
     })
