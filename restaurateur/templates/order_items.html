@@ -48,7 +48,7 @@
               {% for restaurant in order.available_restaurants %}
                 {{ restaurants|get_object_by_id:restaurant }} -
                 {% fetch_distance order restaurants|get_object_by_id:restaurant as distance %}
-                {{ distance|floatformat:3}} км<br>
+                {{ distance }} км<br>
               {% endfor %}
             </delails>
           </td>
