@@ -26,8 +26,13 @@ def get_object_by_id(queryset, id):
 def fetch_distance(*points):
     coordinates = []
     for point in points:
-        point, created = MapPoint.objects.get_or_create(address=point.address)
-        if (point.coordinates_update_date + timedelta(days=1)) < date.today():
+        point, created = MapPoint.objects.get_or_create(
+            address=point.address
+        )
+        if (
+            created
+            or point.coordinates_update_date + timedelta(days=1) < date.today()
+        ):
             update_coordinates(point)
         coordinates.append((point.lat, point.lon))
 

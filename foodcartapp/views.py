@@ -7,6 +7,7 @@ from rest_framework.serializers import ModelSerializer, ListField
 
 from .models import Product, Order, OrderItem
 from addresses.models import MapPoint
+from addresses.fetch_coordinates import fetch_coordinates
 
 
 def banners_list_api(request):
@@ -105,8 +106,13 @@ def register_order(request):
                 price=(product['quantity'] * requested_product.price)
             )
 
+        lon, lat = fetch_coordinates(serializer.validated_data['address'])
         MapPoint.objects.update_or_create(
-            address=serializer.validated_data['address']
+            address=serializer.validated_data['address'],
+            defaults={
+                'lon': lon,
+                'lat': lat
+            }
         )
 
     serializer = OrderSerializer(new_order)

@@ -1,11 +1,11 @@
 from django.db import models
-from .fetch_coordinates import fetch_coordinates
 
 
 class MapPoint(models.Model):
     address = models.CharField(
         'адрес',
-        max_length=200
+        max_length=200,
+        unique=True
     )
     lat = models.FloatField(
         'Широта',
@@ -28,9 +28,3 @@ class MapPoint(models.Model):
 
     def __str__(self):
         return self.address
-
-    def save(self, *args, **kwargs):
-        (lon, lat) = fetch_coordinates(self.address)
-        self.lat = lat
-        self.lon = lon
-        super(MapPoint, self).save(*args, **kwargs)
