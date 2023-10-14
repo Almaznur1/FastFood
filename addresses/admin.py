@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import MapPoint
+from .models import Address
 
 
-@admin.register(MapPoint)
-class MapPointAdmin(admin.ModelAdmin):
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
     list_display = ['address', 'coordinates_update_date']

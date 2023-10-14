@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class MapPoint(models.Model):
+class Address(models.Model):
     address = models.CharField(
         'адрес',
         max_length=200,

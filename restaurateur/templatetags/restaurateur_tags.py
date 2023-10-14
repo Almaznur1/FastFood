@@ -1,7 +1,7 @@
 from django import template
 from geopy import distance
 from datetime import date, timedelta
-from addresses.models import MapPoint
+from addresses.models import Address
 from addresses.fetch_coordinates import fetch_coordinates
 
 register = template.Library()
@@ -26,7 +26,7 @@ def get_object_by_id(queryset, id):
 def fetch_distance(*points):
     coordinates = []
     for point in points:
-        point, created = MapPoint.objects.get_or_create(
+        point, created = Address.objects.get_or_create(
             address=point.address
         )
         if (
