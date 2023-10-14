@@ -3,11 +3,11 @@ from django.templatetags.static import static
 from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.serializers import ModelSerializer, ListField
 
 from .models import Product, Order, OrderItem
 from addresses.models import Address
 from addresses.fetch_coordinates import fetch_coordinates
+from .serializers import OrderSerializer
 
 
 def banners_list_api(request):
@@ -60,26 +60,6 @@ def product_list_api(request):
         'ensure_ascii': False,
         'indent': 4,
     })
-
-
-class OrderItemSerializer(ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ['product', 'quantity']
-
-
-class OrderSerializer(ModelSerializer):
-    products = ListField(
-        child=OrderItemSerializer(),
-        allow_empty=False,
-        write_only=True
-    )
-
-    class Meta:
-        model = Order
-        fields = [
-            'id', 'firstname', 'lastname', 'phonenumber', 'address', 'products'
-        ]
 
 
 @api_view(['POST'])
