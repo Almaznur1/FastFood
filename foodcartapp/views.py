@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from .models import Product, Order, OrderItem
 from addresses.models import Address
 from addresses.fetch_coordinates import fetch_coordinates
-from .serializers import OrderSerializer
+from .serializers import OrderSerializer, OrderItemSerializer
 
 
 def banners_list_api(request):
@@ -64,31 +64,28 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    serializer = OrderSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+    order_serializer = OrderSerializer(data=request.data)
+    order_serializer.is_valid(raise_exception=True)
 
     products = request.data['products']
 
     with transaction.atomic():
-        new_order = Order.objects.create(
-            firstname=serializer.validated_data['firstname'],
-            lastname=serializer.validated_data['lastname'],
-            phonenumber=serializer.validated_data['phonenumber'],
-            address=serializer.validated_data['address'],
-        )
+        new_order = order_serializer.save()
 
         for product in products:
             requested_product = Product.objects.get(pk=product['product'])
-            OrderItem.objects.create(
+
+            order_item_serializer = OrderItemSerializer(data=product)
+            order_item_serializer.is_valid(raise_exception=True)
+            order_item_serializer.create(
+                validated_data=order_item_serializer.validated_data,
                 product=requested_product,
-                quantity=product['quantity'],
-                order=new_order,
-                price=(product['quantity'] * requested_product.price)
+                order=new_order
             )
 
-        lon, lat = fetch_coordinates(serializer.validated_data['address'])
+        lon, lat = fetch_coordinates(order_serializer.validated_data['address'])
         Address.objects.update_or_create(
-            address=serializer.validated_data['address'],
+            address=order_serializer.validated_data['address'],
             defaults={
                 'lon': lon,
                 'lat': lat
