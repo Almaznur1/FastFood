@@ -15,13 +15,12 @@ def fetch_coordinates(address):
             "format": "json",
         })
         response.raise_for_status()
-    except requests.exceptions.RequestException:
+
+        found_places = response.json()['response']['GeoObjectCollection']['featureMember']
+
+        if found_places:
+            most_relevant = found_places[0]
+            lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
+
+    finally:
         return lon, lat
-
-    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
-
-    if found_places:
-        most_relevant = found_places[0]
-        lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
-
-    return lon, lat
