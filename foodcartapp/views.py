@@ -4,10 +4,10 @@ from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Product, Order, OrderItem
+from .models import Product
 from addresses.models import Address
 from addresses.fetch_coordinates import fetch_coordinates
-from .serializers import OrderSerializer, OrderItemSerializer
+from .serializers import OrderSerializer
 
 
 def banners_list_api(request):
@@ -67,21 +67,8 @@ def register_order(request):
     order_serializer = OrderSerializer(data=request.data)
     order_serializer.is_valid(raise_exception=True)
 
-    products = request.data['products']
-
     with transaction.atomic():
         new_order = order_serializer.save()
-
-        for product in products:
-            requested_product = Product.objects.get(pk=product['product'])
-
-            order_item_serializer = OrderItemSerializer(data=product)
-            order_item_serializer.is_valid(raise_exception=True)
-            order_item_serializer.create(
-                validated_data=order_item_serializer.validated_data,
-                product=requested_product,
-                order=new_order
-            )
 
         lon, lat = fetch_coordinates(order_serializer.validated_data['address'])
         Address.objects.update_or_create(

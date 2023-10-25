@@ -8,14 +8,6 @@ class OrderItemSerializer(ModelSerializer):
         model = OrderItem
         fields = ['product', 'quantity']
 
-    def create(self, validated_data, product, order):
-        return OrderItem.objects.create(
-            quantity=validated_data['quantity'],
-            price=(validated_data['quantity'] * product.price),
-            product=product,
-            order=order
-        )
-
 
 class OrderSerializer(ModelSerializer):
     products = ListField(
@@ -32,9 +24,15 @@ class OrderSerializer(ModelSerializer):
         ]
 
     def create(self, validated_data):
-        return Order.objects.create(
-            firstname=validated_data['firstname'],
-            lastname=validated_data['lastname'],
-            phonenumber=validated_data['phonenumber'],
-            address=validated_data['address']
-        )
+        items = validated_data.pop('products')
+
+        order = Order.objects.create(**validated_data)
+
+        for item in items:
+            OrderItem.objects.create(
+                order=order,
+                price=(item['quantity'] * item['product'].price),
+                **item
+            )
+
+        return order
