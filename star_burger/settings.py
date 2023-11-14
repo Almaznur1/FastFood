@@ -20,6 +20,10 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 ROLLBAR_TOKEN = env.str('ROLLBAR_TOKEN')
 ENVIRONMENT = env('ENVIRONMENT', 'development')
 
+DB_NAME = env.str('DB_NAME')
+DB_USER = env.str('DB_USER')
+DB_PASSWORD = env.str('DB_PASSWORD')
+
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
     'restaurateur.apps.RestaurateurConfig',
@@ -32,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'rest_framework',
+    'django_dump_load_utf8',
 ]
 
 MIDDLEWARE = [
@@ -95,7 +100,9 @@ MEDIA_URL = '/media/'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
+        default=f'postgres://{DB_USER}:{DB_PASSWORD}@localhost:/{DB_NAME}',
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 

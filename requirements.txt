@@ -8,3 +8,5 @@ djangorestframework==3.14.0
 requests==2.31.0
 geopy==2.4.0
 rollbar==0.16.3
+psycopg2==2.9.9
+django-dump-load-utf8==0.0.4
