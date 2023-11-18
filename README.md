@@ -156,6 +156,38 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ROLLBAR_TOKEN` — зарегистрируйтесь и получите токен на [rollbar.com](https://rollbar.com/)
 - `ENVIRONMENT` — укажите `production` для prod-версии. По умолчание стоит `development`
 
+## Автоматизация деплоя
+Для упрощения обновления кода и автоматизации деплоя создайте на сервере bash-скрипт `deploy_star_burger.sh` со следующими командами:
+
+```sh
+#!/bin/bash
+set -e
+cd /opt/StarBurgerFastFood  # укажите путь до рабочей папки
+git pull
+if git pull | grep -q 'Already up to date.'
+then
+true
+else
+source ./venv/bin/activate
+pip install -r requirements.txt
+apt install nodejs
+apt install npm
+./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+python3 manage.py collectstatic --noinput
+python3 manage.py migrate
+systemctl restart star_burger.service
+git add .
+git commit -m 'deploy'
+echo "deployment completed successfully"
+fi
+```
+
+Запустите скрипт:
+
+```sh
+./deploy_star_burger.sh
+```
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
