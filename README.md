@@ -166,32 +166,50 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ENVIRONMENT` — укажите `production` для prod-версии. По умолчание стоит `development`
 
 ## Автоматизация деплоя
-Для упрощения обновления кода и автоматизации деплоя создайте на сервере bash-скрипт `deploy_star_burger.sh` со следующими командами:
+Для упрощения обновления кода и автоматизации запустите bash-скрипт `deploy_star_burger.sh` со следующими командами:
 
 ```sh
 #!/bin/bash
 set -e
-cd /opt/StarBurgerFastFood  # укажите путь до рабочей папки
-git pull
+cd /opt/StarBurgerFastFood  # замените на путь до вашего проекта
 if git pull | grep -q 'Already up to date.'
 then
-true
+echo 'Already up to date.'
 else
 source ./venv/bin/activate
 pip install -r requirements.txt
-apt install nodejs
-apt install npm
 ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 python3 manage.py collectstatic --noinput
-python3 manage.py migrate
+python3 manage.py migrate --noinput
 systemctl restart star_burger.service
-git add .
-git commit -m 'deploy'
+curl --request POST \
+     --url https://api.rollbar.com/api/1/deploy \
+     --header "X-Rollbar-Access-Token: $rollbar_token" \
+     --header "accept: application/json" \
+     --header "content-type: application/json" \
+     --data '
+{
+  "environment": "production",
+  "revision": "$(git rev-parse HEAD)"
+}
+'
 echo "deployment completed successfully"
 fi
 ```
 
-Запустите скрипт:
+Перед запуском откройте файл `.profile`, который находится в директории пользователя:
+```sh
+nano profile
+```
+и в конце файла добавьте строку:
+```sh
+export rollbar_token=<ваш токен от rollbar>
+```
+Чтобы применить изменения к текущей сессии без перезагрузки, вы можете выполнить следующую команду:
+```sh
+source ~/.profile
+```
+Затем запустите скрипт:
 
 ```sh
 ./deploy_star_burger.sh
