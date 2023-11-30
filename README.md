@@ -59,11 +59,17 @@ pip install -r requirements.txt
 SECRET_KEY=django-insecure-0if40nf4nf93n4
 ```
 
-Создайте БД Postgresql. [Туториал.](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04) Добавьте в `.env` следующие данные:
+Создайте БД Postgresql. [Туториал.](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04)
 
-- `DB_NAME` — название вашей БД
-- `DB_USER` — пользователь, который имеет доступ к БД
-- `DB_PASSWORD` — пароль пользователя БД
+Добавьте в `.env` следующую строку:
+
+```
+DATABASE_URL=postgres://<database user>:<user's password>@localhost:/<your DB name>
+```
+где:
+- `<your DB name>` — название вашей БД
+- `<database user>` — пользователь, который имеет доступ к БД
+- `<user's password>` — пароль пользователя БД
 
 Сделайте миграцию следующей командой:
 

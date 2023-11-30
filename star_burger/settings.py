@@ -1,7 +1,5 @@
 import os
 
-import dj_database_url
-
 from environs import Env
 
 
@@ -19,10 +17,6 @@ GEOCODER_API_KEY = env.str('GEOCODER_API_KEY')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 ROLLBAR_TOKEN = env.str('ROLLBAR_TOKEN', None)
 ENVIRONMENT = env('ENVIRONMENT', 'development')
-
-DB_NAME = env.str('DB_NAME')
-DB_USER = env.str('DB_USER')
-DB_PASSWORD = env.str('DB_PASSWORD')
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -99,11 +93,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f'postgres://{DB_USER}:{DB_PASSWORD}@localhost:/{DB_NAME}',
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': env.dj_db_url('DATABASE_URL')
 }
 
 AUTH_PASSWORD_VALIDATORS = [
