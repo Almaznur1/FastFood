@@ -17,7 +17,7 @@ DEBUG = env.bool('DEBUG', False)
 GEOCODER_API_KEY = env.str('GEOCODER_API_KEY')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
-ROLLBAR_TOKEN = env.str('ROLLBAR_TOKEN')
+ROLLBAR_TOKEN = env.str('ROLLBAR_TOKEN', None)
 ENVIRONMENT = env('ENVIRONMENT', 'development')
 
 DB_NAME = env.str('DB_NAME')
