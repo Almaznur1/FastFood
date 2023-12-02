@@ -188,12 +188,12 @@ curl --request POST \
      --header "X-Rollbar-Access-Token: $ROLLBAR_TOKEN" \
      --header "accept: application/json" \
      --header "content-type: application/json" \
-     --data '
+     --data "
 {
-  "environment": "production",
-  "revision": "$(git rev-parse HEAD)"
+  \"environment\": \"production\",
+  \"revision\": \"$(git rev-parse HEAD)\"
 }
-'
+"
 echo "deployment completed successfully"
 fi
 ```
