@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-cd /opt/StarBurgerFastFood  # put here your project path
+cd /opt/StarBurgerFastFood  # замените на путь до вашего проекта
 if git pull | grep -q 'Already up to date.'
 then
 echo 'Already up to date.'
@@ -13,7 +13,7 @@ python3 manage.py migrate --noinput
 systemctl restart star_burger.service
 curl --request POST \
      --url https://api.rollbar.com/api/1/deploy \
-     --header "X-Rollbar-Access-Token: $rollbar_token" \
+     --header "X-Rollbar-Access-Token: $ROLLBAR_TOKEN" \
      --header "accept: application/json" \
      --header "content-type: application/json" \
      --data '

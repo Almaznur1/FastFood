@@ -21,12 +21,12 @@
 
 Скачайте код:
 ```sh
-git clone https://github.com/devmanorg/star-burger.git
+git clone git@github.com:Almaznur1/StarBurgerFastFood.git
 ```
 
 Перейдите в каталог проекта:
 ```sh
-cd star-burger
+cd StarBurgerFastFood
 ```
 
 [Установите Python](https://www.python.org/), если этого ещё не сделали.
@@ -54,12 +54,12 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
+Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `StarBurgerFastFood/` и положите туда такой код:
 ```sh
-SECRET_KEY=django-insecure-0if40nf4nf93n4
+SECRET_KEY=<секретный ключ вашего проекта>
 ```
 
-Создайте БД Postgresql. [Туториал.](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04)
+<a name="Postgresql"></a>Создайте БД Postgresql. [Туториал.](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04)
 
 Добавьте в `.env` следующую строку:
 
@@ -109,7 +109,7 @@ npm --version
 Перейдите в каталог проекта и установите пакеты Node.js:
 
 ```sh
-cd star-burger
+cd StarBurgerFastFood
 npm ci --dev
 ```
 
@@ -154,11 +154,12 @@ Parcel будет следить за файлами в каталоге `bundle
 ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 ```
 
-Настроить бэкенд: создать файл `.env` в каталоге `star_burger/` со следующими настройками:
+Настроить бэкенд: создать файл `.env` в каталоге `StarBurgerFastFood/` со следующими настройками:
 
 - `DEBUG` — дебаг-режим. Поставьте `False`.
-- `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
-- `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+- `SECRET_KEY` — секретный ключ вашего проекта
+- `ALLOWED_HOSTS` — добавьте IP-адрес вашего сервера и доменное имя сайта через запятую
+- `DATABASE_URL` — [см. настройки Postgresql для dev-версии](#Postgresql)
 
 Следующие настройки требуются только при подключении системы логирования Rollbar:
 
@@ -166,7 +167,7 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ENVIRONMENT` — укажите `production` для prod-версии. По умолчание стоит `development`
 
 ## Автоматизация деплоя
-Для упрощения обновления кода и автоматизации запустите bash-скрипт `deploy_star_burger.sh` со следующими командами:
+Для упрощения обновления кода и автоматизации запустите bash-скрипт `deploy_star_burger.sh`, который находится в корневой директории проекта и содержит следующие команды:
 
 ```sh
 #!/bin/bash
@@ -184,7 +185,7 @@ python3 manage.py migrate --noinput
 systemctl restart star_burger.service
 curl --request POST \
      --url https://api.rollbar.com/api/1/deploy \
-     --header "X-Rollbar-Access-Token: $rollbar_token" \
+     --header "X-Rollbar-Access-Token: $ROLLBAR_TOKEN" \
      --header "accept: application/json" \
      --header "content-type: application/json" \
      --data '
@@ -203,7 +204,7 @@ nano profile
 ```
 и в конце файла добавьте строку:
 ```sh
-export rollbar_token=<ваш токен от rollbar>
+export ROLLBAR_TOKEN=<ваш токен от rollbar>
 ```
 Чтобы применить изменения к текущей сессии без перезагрузки, вы можете выполнить следующую команду:
 ```sh
